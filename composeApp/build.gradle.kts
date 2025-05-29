@@ -36,6 +36,12 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            implementation(libs.android.driver)
+            implementation(libs.androidx.material3)
+
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.navigation.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -46,20 +52,31 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            implementation(libs.kotlinx.coroutines.core) // Use latest version
+            implementation(libs.kotlinx.datetime) // Use latest version
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.sqlite.driver)
+
+            implementation(compose.desktop.currentOs) // For common, window, runtime, etc.
+            implementation(compose.material3)         // For Material Design 3 components
+            implementation(compose.materialIconsExtended) // For icons
+        }
+        iosMain.dependencies {
+            implementation(libs.native.driver)
         }
     }
 }
 
 android {
-    namespace = "org.example.random"
+    namespace = "com.nfn8y.notesapp.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "org.example.random"
+        applicationId = "com.nfn8y.notesapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -87,11 +104,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "org.example.random.MainKt"
+        mainClass = "com.nfn8y.notesapp.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.example.random"
+            packageName = "com.nfn8y.notesapp"
             packageVersion = "1.0.0"
         }
     }
