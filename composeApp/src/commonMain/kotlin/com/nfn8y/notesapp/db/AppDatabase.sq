@@ -1,0 +1,35 @@
+-- Import adapter for kotlinx.datetime.Instant
+-- SQLDelight 2.x supports adapters for kotlinx-datetime types.
+-- We will store Instants as Long (epoch milliseconds).
+-- The adapter will be configured when creating the database instance.
+
+CREATE TABLE NoteEntity (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    createdAt INTEGER AS kotlinx.datetime.Instant NOT NULL, -- Stored as epoch milliseconds
+    updatedAt INTEGER AS kotlinx.datetime.Instant NOT NULL  -- Stored as epoch milliseconds
+);
+
+-- Queries
+selectAll:
+SELECT * FROM NoteEntity ORDER BY updatedAt DESC;
+
+selectById:
+SELECT * FROM NoteEntity WHERE id = :id;
+
+insert:
+INSERT INTO NoteEntity(title, content, createdAt, updatedAt)
+VALUES (:title, :content, :createdAt, :updatedAt);
+
+-- Query to get the ID of the last inserted row
+getInsertId:
+SELECT last_insert_rowid();
+
+updateById:
+UPDATE NoteEntity
+SET title = :title, content = :content, updatedAt = :updatedAt
+WHERE id = :id;
+
+deleteById:
+DELETE FROM NoteEntity WHERE id = :id;

@@ -7,6 +7,16 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.sqldelight)
+}
+
+sqldelight {
+    databases {
+        create("AppDatabase") { // Defines a database named AppDatabase
+            packageName.set("com.nfn8y.notesapp.db")
+            // sourceFolders.set(listOf("src/commonMain/sqldelight")) // Default, adjust if needed
+        }
+    }
 }
 
 kotlin.sourceSets.all {
@@ -20,7 +30,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosX64(),
         iosArm64(),
@@ -31,50 +41,57 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     jvm("desktop")
-    
+
     sourceSets {
-        val desktopMain by getting
-        
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
+        val commonMain by getting {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.datetime)
+                api(libs.kmp.nativecoroutines.core)
 
-            implementation(libs.android.driver)
-            implementation(libs.androidx.material3)
-
-            implementation(libs.androidx.lifecycle.viewmodel.compose)
-            implementation(libs.androidx.navigation.compose)
+                implementation(libs.runtime)
+                implementation(libs.coroutines.extensions)
+            }
         }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-
-            implementation(libs.kotlinx.coroutines.core) // Use latest version
-            implementation(libs.kotlinx.datetime) // Use latest version
-
-            // Make sure to use the LATEST versions from the KMP-NativeCoroutines GitHub page
-            api(libs.kmp.nativecoroutines.core) // Example version
+        val androidMain by getting {
+            dependencies {
+                implementation(compose.preview)
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.material3)
+                implementation(libs.androidx.lifecycle.viewmodel.compose)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.android.driver.v210)
+            }
         }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.sqlite.driver)
-
-            implementation(compose.desktop.currentOs) // For common, window, runtime, etc.
-            implementation(compose.material3)         // For Material Design 3 components
-            implementation(compose.materialIconsExtended) // For icons
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(libs.kotlinx.coroutines.swing)
+                implementation(libs.sqlite.driver.v210) // For JVM SQLite
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
+            }
         }
-        iosMain.dependencies {
-            implementation(libs.native.driver)
+        val iosMain by creating { // Or configure for specific ios targets like iosX64Main, etc.
+            dependsOn(commonMain)
+            dependencies {
+                implementation(libs.native.driver.v210)
+            }
         }
+        // Example for individual iOS targets if not using a common iosMain for these dependencies:
+        // val iosX64Main by getting { dependencies { implementation("app.cash.sqldelight:native-driver:2.1.0") } }
+        // val iosArm64Main by getting { dependencies { implementation("app.cash.sqldelight:native-driver:2.1.0") } }
+        // val iosSimulatorArm64Main by getting { dependencies { implementation("app.cash.sqldelight:native-driver:2.1.0") } }
     }
 }
 

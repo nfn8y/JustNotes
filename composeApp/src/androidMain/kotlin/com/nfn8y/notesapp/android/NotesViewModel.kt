@@ -3,41 +3,49 @@ package com.nfn8y.notesapp.android
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nfn8y.notesapp.common.model.Note
-import com.nfn8y.notesapp.common.repository.InMemoryNoteRepository
 import com.nfn8y.notesapp.common.repository.NoteRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import com.nfn8y.notesapp.common.usecase.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlin.random.Random
+import kotlinx.coroutines.withContext
 
 class NotesViewModel(
-    private val noteRepository: NoteRepository = InMemoryNoteRepository // In the real app, inject this
+    private val noteRepository: NoteRepository // Injected
 ) : ViewModel() {
 
-    val notes: StateFlow<List<Note>> = noteRepository.getAllNotesFlow()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    private val getNotesUseCase = GetNotesUseCase(noteRepository)
+    private val addNoteUseCase = AddNoteUseCase(noteRepository)
+    private val getNoteByIdUseCase = GetNoteByIdUseCase(noteRepository)
+    private val updateNoteUseCase = UpdateNoteUseCase(noteRepository)
+    private val deleteNoteUseCase = DeleteNoteUseCase(noteRepository)
+
+    val notes: StateFlow<List<Note>> = getNotesUseCase()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), emptyList())
 
     fun addNote(title: String, content: String) {
-        viewModelScope.launch {
-            val newNote = Note.createNew(Random.nextInt().toString(), title, content)
-            noteRepository.addNote(newNote)
+        viewModelScope.launch(Dispatchers.IO) {
+            addNoteUseCase(title, content)
+            // UI will update via the notes flow
         }
     }
 
     fun updateNote(note: Note) {
-        viewModelScope.launch {
-            noteRepository.updateNote(note)
+        viewModelScope.launch(Dispatchers.IO) {
+            updateNoteUseCase(note.copy(updatedAt = kotlinx.datetime.Clock.System.now()))
         }
     }
 
-    fun deleteNote(noteId: String) {
-        viewModelScope.launch {
-            noteRepository.deleteNoteById(noteId)
+    fun deleteNote(noteId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteNoteUseCase(noteId)
         }
     }
 
-    suspend fun getNoteById(noteId: String): Note? {
-        return noteRepository.getNoteById(noteId)
+    suspend fun getNoteById(noteId: Long): Note? {
+        return withContext(Dispatchers.IO) {
+            getNoteByIdUseCase(noteId)
+        }
     }
 }
