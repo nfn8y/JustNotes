@@ -7,6 +7,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+
+    id("com.google.devtools.ksp") version "2.2.0-RC-2.0.1"
+    id("com.rickclephas.kmp.nativecoroutines") version "1.0.0-ALPHA-43"
 }
 
 kotlin {
@@ -55,6 +58,12 @@ kotlin {
 
             implementation(libs.kotlinx.coroutines.core) // Use latest version
             implementation(libs.kotlinx.datetime) // Use latest version
+
+            // Make sure to use the LATEST versions from the KMP-NativeCoroutines GitHub page
+            api(libs.kmp.nativecoroutines.core) // Example version
+            api(libs.kmp.nativecoroutines.combine) // Example version for Combine
+            api(libs.kmp.nativecoroutines.swift) // Example version for Swift async/await
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
