@@ -25,7 +25,7 @@ import com.nfn8y.notesapp.desktop.ui.theme.DesktopAppTheme
 
 @Composable
 @Preview
-fun AppPreview() { // For previewing in IntelliJ
+fun AppPreview() { // For previewing in IntelliJ,
     // You might need to provide a CoroutineScope for the preview if ViewModel uses it in init
     val previewViewModel = DesktopNotesViewModel()
     DesktopApp(previewViewModel)
