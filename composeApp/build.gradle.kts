@@ -111,7 +111,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.nfn8y.notesapp.MainKt"
+        mainClass = "com.nfn8y.notesapp.desktop.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
