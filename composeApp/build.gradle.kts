@@ -70,14 +70,14 @@ kotlin {
                 implementation(libs.androidx.material3)
                 implementation(libs.androidx.lifecycle.viewmodel.compose)
                 implementation(libs.androidx.navigation.compose)
-                implementation(libs.android.driver.v210)
+                implementation(libs.android.driver)
             }
         }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
-                implementation(libs.sqlite.driver.v210) // For JVM SQLite
+                implementation(libs.sqlite.driver) // For JVM SQLite
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
             }
@@ -85,7 +85,7 @@ kotlin {
         val iosMain by creating { // Or configure for specific ios targets like iosX64Main, etc.
             dependsOn(commonMain)
             dependencies {
-                implementation(libs.native.driver.v210)
+                implementation(libs.native.driver)
             }
         }
         // Example for individual iOS targets if not using a common iosMain for these dependencies:
